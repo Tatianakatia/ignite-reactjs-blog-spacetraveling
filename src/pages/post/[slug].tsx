@@ -1,5 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-
+import Head from 'next/head';
+import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -26,20 +27,47 @@ interface PostProps {
   post: Post;
 }
 
-// export default function Post() {
-//   // TODO
-// }
+export default function Post(): JSX.Element {
+  // TODO
+  return (
+    <>
+      <Head>
+        <title>Posts | SpaceTraveling </title>
+      </Head>
 
-// export const getStaticPaths = async () => {
-//   const prismic = getPrismicClient();
-//   const posts = await prismic.query(TODO);
+      <main className={styles.container}>
+        <div className={styles.posts}>
+          <a>
+            <time />
+            <strong />
+            <p />
+          </a>
+        </div>
+      </main>
+    </>
+  );
+}
 
-//   // TODO
-// };
+export const getStaticPaths = async () => {
+  const prismic = getPrismicClient();
+  const posts = await prismic.query(
+    [Prismic.predicates.at('document.type', 'publication')],
+    {
+      fetch: ['publication.title', 'publication.content'],
+      pageSize: 100,
+    }
+  );
 
-// export const getStaticProps = async context => {
-//   const prismic = getPrismicClient();
-//   const response = await prismic.getByUID(TODO);
+  // TODO
+  return {};
+};
 
-//   // TODO
-// };
+export const getStaticProps = async context => {
+  const prismic = getPrismicClient();
+  const response = await prismic.getByUID();
+
+  // TODO
+  return {
+    props: {},
+  };
+};
