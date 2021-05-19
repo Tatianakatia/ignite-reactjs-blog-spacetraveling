@@ -1,12 +1,12 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetStaticProps } from 'next';
 import Head from 'next/head';
-import Prismic from '@prismicio/client';
+import { RichText } from 'prismic-dom';
 import { getPrismicClient } from '../../services/prismic';
 
-import commonStyles from '../../styles/common.module.scss';
-import styles from './post.module.scss';
+import postStyles from './post.module.scss';
 
 interface Post {
+  slug: string;
   first_publication_date: string | null;
   data: {
     title: string;
@@ -27,47 +27,54 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post(): JSX.Element {
+export default function Post({ post }: PostProps): JSX.Element {
   // TODO
   return (
     <>
       <Head>
-        <title>Posts | SpaceTraveling </title>
+        <title>{post.data.title}| SpaceTraveling </title>
       </Head>
 
-      <main className={styles.container}>
-        <div className={styles.posts}>
-          <a>
-            <time />
-            <strong />
-            <p />
-          </a>
-        </div>
+      <main className={postStyles.container}>
+        <article className={postStyles.post}>
+          <h1>{post.data.title}</h1>
+          <h5>{post.data.author}</h5>
+          <time>{post.first_publication_date}</time>
+          <div className={postStyles.postContent}>{post.data.content}</div>
+        </article>
       </main>
     </>
   );
 }
 
-export const getStaticPaths = async () => {
-  const prismic = getPrismicClient();
-  const posts = await prismic.query(
-    [Prismic.predicates.at('document.type', 'publication')],
-    {
-      fetch: ['publication.title', 'publication.content'],
-      pageSize: 100,
-    }
-  );
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   // TODO
+//   return {};
+// };
 
-  // TODO
-  return {};
-};
-
-export const getStaticProps = async context => {
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug } = params;
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID();
+  const response = await prismic.getByUID('publication', String(slug), {});
+
+  const post = {
+    slug,
+    title: RichText.asText(response.data.title),
+    subitle: RichText.asHtml(response.data.subtitle),
+    updatedAt: new Date(response.last_publication_date).toLocaleDateString(
+      'en',
+      {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }
+    ),
+  };
 
   // TODO
   return {
-    props: {},
+    props: {
+      post,
+    },
   };
 };

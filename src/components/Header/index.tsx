@@ -1,14 +1,15 @@
+import Link from 'next/link';
 import styles from './header.module.scss';
 
-export default function Header() {
+import { ActiveLink } from '../ActiveLink';
+
+export default function Header(): JSX.Element {
   // TODO
   return (
     <header className={styles.container}>
-      <div className={styles.posts}>
-        <img src="/images/logo.svg" alt="Space Traveling" />
-        <h1 className={styles.title}>Home</h1>
-        <a>Posts</a>
-      </div>
+      <Link href="/">
+        <img src="/images/logo.svg" alt="logo" />
+      </Link>
     </header>
   );
 }
